@@ -4024,6 +4024,9 @@ BX_TRACE("%d, %d, %d, %s", _array, _srgb, _mipAutogen, getName(_format) );
 			GLSL_TYPE(GL_IMAGE_CUBE);
 			GLSL_TYPE(GL_INT_IMAGE_CUBE);
 			GLSL_TYPE(GL_UNSIGNED_INT_IMAGE_CUBE);
+
+			case 0x8D65: return "GL_TEXTURE_EXTERNAL_OES";
+			case 0x8D66: return "GL_TEXTURE_SAMPLER_EXTERNAL_OES";
 		}
 
 #undef GLSL_TYPE
@@ -4122,6 +4125,7 @@ BX_TRACE("%d, %d, %d, %s", _array, _srgb, _mipAutogen, getName(_format) );
 		case GL_IMAGE_CUBE:
 		case GL_INT_IMAGE_CUBE:
 		case GL_UNSIGNED_INT_IMAGE_CUBE:
+		case 0x8D66: // external OES
 			return UniformType::Sampler;
 		};
 
@@ -5004,6 +5008,7 @@ BX_TRACE("%d, %d, %d, %s", _array, _srgb, _mipAutogen, getName(_format) );
 	void TextureGL::overrideInternal(uintptr_t _ptr)
 	{
 		destroy();
+		m_target = 0x8D65; // GL_TEXTURE_EXTERNAL_OES
 		m_flags |= BGFX_SAMPLER_INTERNAL_SHARED;
 		m_id = (GLuint)_ptr;
 	}
@@ -5737,6 +5742,7 @@ BX_TRACE("%d, %d, %d, %s", _array, _srgb, _mipAutogen, getName(_format) );
 					{
 						bx::write(&writer, &err
 							, "#version 300 es\n"
+							  "#extension GL_OES_EGL_image_external_essl3 : require\n"
 							  "precision %s float;\n"
 							, m_type == GL_FRAGMENT_SHADER ? "mediump" : "highp"
 							);
